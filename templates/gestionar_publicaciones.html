@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<div class="container">
+    <h1 style="color:black;margin-top:55px">Gestionar Publicaciones</h1>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'Post:gestionar_publicaciones' %}?sort=asc" class="btn btn-primary me-2">Fecha: Ascendente</a>
+        <a href="{% url 'Post:gestionar_publicaciones' %}?sort=desc" class="btn btn-primary">Fecha: Descendente</a>
+    </div>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#crearPublicacionModal">
+        Crear Nueva Publicación
+    </button>
+
+    {% if publicaciones %}
+        <h2 style="color:black">Tus Publicaciones</h2>
+        <div class="row">
+            {% for publicacion in publicaciones %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-lg border-light position-relative">
+                        <p class="d-inline-flex gap-1 position-absolute" style="top: 10px; right: 10px;">
+                            <!-- Botón principal -->
+                            <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target=".multi-collapse" aria-expanded="false" aria-controls="multiCollapseExample1 multiCollapseExample2" style="width:25px; height:25px; display: flex; align-items: center; justify-content: center;margin-right:2px">
+                                +
+                            </button>
+                        </p>
+
+                        <!-- Botón flotante (Eliminar) -->
+                        <div class="collapse multi-collapse" id="multiCollapseExample1" style="position:absolute; top: 50px; right: 10px;">
+                            <a  onclick="confirmarEliminacion()" href="{% url 'Post:eliminar_publicacion' publicacion.id %}" class="btn btn-danger" style="height:30px;width:30px; display: flex; align-items: center; justify-content: center;margin-top:15px">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </div>
+
+
+                        <!-- Botón flotante 2 (Editar) -->
+                        <div class="collapse multi-collapse" id="multiCollapseExample2" style="position:absolute; top: 90px; right: 10px;">
+                            <button class="btn btn-success" style="height:30px;width:30px; display: flex; align-items: center; justify-content: center;margin-top:15px" data-bs-toggle="modal" data-bs-target="#editarPublicacionModal" data-id="{{ publicacion.id }}" data-titulo="{{ publicacion.titulo }}" data-descripcion="{{ publicacion.descripcion }}" data-monto="{{ publicacion.limite_monto }}" data-ubicacion="{{ publicacion.ubicacion }}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                        </div>
+
+                        <img src="{% if publicacion.imagen %}{{ publicacion.imagen.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" alt="Imagen de la publicación" class="card-img-top" style="max-height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <p style="color:black"><strong>Creada por:</strong> {{ publicacion.cliente.username }}</p>
+                            <h5 class="card-title" style="color:black">{{ publicacion.titulo }}</h5>
+                            <div class="post-content" style="background-color: #cfcfcf;border-radius:15px">
+                                <p class="card-text" style="color:black;margin:5px">{{ publicacion.descripcion }}</p>
+                            </div>
+
+                            <p style="color:black"><strong>Límite a pagar:</strong> ${% load l10n %}
+                                {{ publicacion.limite_monto|localize }} CLP
+                            </p>
+                            <p style="color:black"><strong>Ubicación:</strong> {{ publicacion.ubicacion }}</p>
+                            <p style="color:black; text-transform: uppercase;"><strong>Estado:</strong> {{ publicacion.estado }}</p>
+                            <p style="color:black; text-transform: uppercase;"><strong>Creado el:</strong> {{ publicacion.fecha_publicacion }}</p>
+                            <p style="color:black; text-transform: uppercase;"><strong>Fecha de creación:</strong> {{ publicacion.fecha_publicacion }}</p>
+                            <p style="color:black; text-transform: uppercase;"><strong>Oficios:</strong> {{ publicacion.oficio }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p style="color:black;margin-top:10px">No tienes publicaciones subidas. ¿Quieres crear una nueva?</p>
+    {% endif %}
+
+    
+
+    
+
+    <!-- Modal para crear nueva publicación -->
+    <div class="modal fade" id="crearPublicacionModal" tabindex="-1" aria-labelledby="crearPublicacionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="crearPublicacionModalLabel" style="color:black">Nueva Publicación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data" style="color:black">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        
+                        <button type="submit" class="btn btn-primary">Subir Publicación</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ 
+        <!-- Modal para editar publicación -->
+    <div class="modal fade" id="editarPublicacionModal" tabindex="-1" aria-labelledby="editarPublicacionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarPublicacionModalLabel" style="color:black">Editar Publicación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" enctype="multipart/form-data" style="color:black">
+                        {% csrf_token %}
+                        <!-- Campo oculto para el ID de la publicación -->
+                        <input type="hidden" id="publicacion_id" name="publicacion_id">
+
+                        <!-- Campo para el título -->
+                        <label for="titulo">Título</label>
+                        <input type="text" id="titulo" name="titulo" class="form-control" required>
+
+                        <!-- Campo para la descripción -->
+                        <label for="descripcion">Descripción</label>
+                        <textarea id="descripcion" name="descripcion" class="form-control" required></textarea>
+
+                        <!-- Campo para el límite a pagar -->
+                        <label for="limite_monto">Límite a Pagar</label>
+                        <input type="number" id="limite_monto" name="limite_monto" class="form-control" required>
+
+                        <!-- Campo para la ubicación con un select de comunas -->
+                        <label for="ubicacion">Ubicación</label>
+                        <select id="ubicacion" name="ubicacion" class="form-control" required>
+                            <option value="Cerrillos">Cerrillos</option>
+                            <option value="Cerro Navia">Cerro Navia</option>
+                            <option value="Conchalí">Conchalí</option>
+                            <option value="El Bosque">El Bosque</option>
+                            <option value="Estación Central">Estación Central</option>
+                            <option value="Huechuraba">Huechuraba</option>
+                            <option value="Independencia">Independencia</option>
+                            <option value="La Cisterna">La Cisterna</option>
+                            <option value="La Florida">La Florida</option>
+                            <option value="La Granja">La Granja</option>
+                            <option value="La Pintana">La Pintana</option>
+                            <option value="La Reina">La Reina</option>
+                            <option value="Las Condes">Las Condes</option>
+                            <option value="Lo Barnechea">Lo Barnechea</option>
+                            <option value="Lo Espejo">Lo Espejo</option>
+                            <option value="Lo Prado">Lo Prado</option>
+                            <option value="Macul">Macul</option>
+                            <option value="Maipú">Maipú</option>
+                            <option value="Ñuñoa">Ñuñoa</option>
+                            <option value="Pedro Aguirre Cerda">Pedro Aguirre Cerda</option>
+                            <option value="Peñalolén">Peñalolén</option>
+                            <option value="Providencia">Providencia</option>
+                            <option value="Pudahuel">Pudahuel</option>
+                            <option value="Quilicura">Quilicura</option>
+                            <option value="Quinta Normal">Quinta Normal</option>
+                            <option value="Recoleta">Recoleta</option>
+                            <option value="Renca">Renca</option>
+                            <option value="San Joaquín">San Joaquín</option>
+                            <option value="San Miguel">San Miguel</option>
+                            <option value="San Ramón">San Ramón</option>
+                            <option value="Santiago">Santiago</option>
+                            <option value="Vitacura">Vitacura</option>
+                        </select>
+
+                        <!-- Campo para el oficio -->
+                        <label for="oficio">Oficio</label>
+                        <select id="oficio" name="oficio" class="form-control" required>
+                            <option value="fontaneria">Técnico en fontanería</option>
+                            <option value="electricidad">Técnico en electricidad</option>
+                            <option value="climatizacion">Técnico en climatización</option>
+                            <option value="carpinteria">Técnico en carpintería</option>
+                            <option value="pintura">Técnico en pintura</option>
+                            <option value="cerrajeria">Técnico en cerrajería</option>
+                            <option value="electrodomesticos">Técnico en reparación de electrodomésticos</option>
+                            <option value="seguridad">Técnico en instalación de sistemas de seguridad</option>
+                            <option value="jardineria">Técnico en mantenimiento de jardines</option>
+                            <option value="gas">Técnico en gas</option>
+                            <option value="energias_renovables">Técnico en instalación de sistemas de energía renovable</option>
+                            <option value="domotica">Técnico en sistemas de domótica</option>
+                            <option value="dranaje">Técnico en drenaje y saneamiento</option>
+                            <option value="impermeabilizacion">Técnico en impermeabilización</option>
+                            <option value="piscinas">Técnico en mantenimiento de piscinas</option>
+                            <option value="remodelacion">Técnico en remodelación de interiores</option>
+                            <option value="reparacion_electrodomesticos_cocina">Técnico en reparación de electrodomésticos de cocina</option>
+                            <option value="aislamiento">Técnico en aislamiento térmico y acústico</option>
+                            <option value="telecomunicaciones">Técnico en instalación de sistemas de telecomunicaciones</option>
+                            <option value="computadoras">Técnico en reparación de computadoras y dispositivos electrónicos</option>
+                            <option value="limpieza">Técnico en limpieza profunda</option>
+                            <option value="cortinas">Técnico en instalación de cortinas y persianas</option>
+                            <option value="plagas">Técnico en exterminación de plagas</option>
+                            <option value="tapiceria">Técnico en tapicería</option>
+                            <option value="electrodomesticos_pequenos">Técnico en reparación de electrodomésticos pequeños</option>
+                            <option value="agua_potable">Técnico en instalación de sistemas de agua potable</option>
+                            <option value="instalaciones_sanitarias">Técnico en instalaciones sanitarias</option>
+                            <option value="calefaccion">Técnico en instalación de sistemas de calefacción</option>
+                            <option value="ventilacion">Técnico en instalación de sistemas de ventilación</option>
+                            <option value="mantenimiento_telecomunicaciones">Técnico en mantenimiento de sistemas de telecomunicaciones y cableado</option>
+                            <option value="alarma_incendios">Técnico en sistemas de alarma contra incendios</option>
+                            <option value="techos">Técnico en reparación de techos y cubiertas</option>
+                            <option value="paneles_solares_termicos">Técnico en instalaciones de paneles solares térmicos</option>
+                            <option value="tratamiento_aguas_residuales">Técnico en instalación de sistemas de tratamiento de aguas residuales</option>
+                            <option value="climatizacion_industrial">Técnico en mantenimiento de sistemas de climatización industrial</option>
+                            <option value="otros">Otro</option>
+                        </select>
+                        
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    {% if form.errors %}
+        <ul class="errorlist">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+
+
+
+</div>
+
+<!-- Estilos personalizados -->
+<style>
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+        background-color: #f9f9f9;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .container {
+        margin-top: 30px;
+    }
+
+    .btn-success {
+        margin-top: 20px;
+    }
+
+    .modal-dialog {
+        max-width: 600px;
+    }
+
+    /* Transición suave para el despliegue de los botones */
+    .collapse {
+        transition: height 0.5s ease;
+    }
+</style>
+
+<script>
+
+    
+    
+
+    function confirmarEliminacion() {
+        if (confirm('¿Estás seguro de que deseas eliminar esta publicación?')) {
+            // Si el usuario confirma, envía el formulario
+            document.forms[0].submit();
+        } else {
+            // Si el usuario cancela, no se envía el formulario
+        }
+    }
+    
+
+    
+    // Script para llenar los campos del modal con los valores de la publicación seleccionada
+    var editarModal = document.getElementById('editarPublicacionModal');
+    editarModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Botón que activó el modal
+        var id = button.getAttribute('data-id');
+        var titulo = button.getAttribute('data-titulo');
+        var descripcion = button.getAttribute('data-descripcion');
+        var monto = button.getAttribute('data-monto');
+        var ubicacion = button.getAttribute('data-ubicacion');
+
+        // Rellenar los campos del formulario en el modal
+        document.getElementById('publicacion_id').value = id;
+        document.getElementById('titulo').value = titulo;
+        document.getElementById('descripcion').value = descripcion;
+        document.getElementById('limite_monto').value = monto;
+        document.getElementById('ubicacion').value = ubicacion;
+    });
+</script>
+
+{% endblock %}

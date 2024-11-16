@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<div class="container">
+    <div class="row justify-content-center" style="height: 100vh;">
+        <div class="col-12 d-flex align-items-center justify-content-center">
+            <div class="RecuadroRegistro" style="width:85%;height: auto; margin-top: 100px;">
+                <h2 class="text-center bg-purple text-white py-2 rounded">Registro de Técnico</h2>
+                <form method="post" enctype="multipart/form-data">  <!-- Agregamos enctype para archivos -->
+                    {% csrf_token %}
+
+                    
+                    
+                    <!-- Renderiza cada campo del formulario manualmente -->
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.nombre.label }}</label>
+                        <input type="text" name="{{ form.nombre.name }}" class="form-control" value="{{ form.nombre.value|default_if_none:'' }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.email.label }}</label>
+                        <input type="email" name="{{ form.email.name }}" class="form-control" value="{{ form.email.value|default_if_none:'' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.password1.label }}</label>
+                        <input type="password" name="{{ form.password1.name }}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.password2.label }}</label>
+                        <input type="password" name="{{ form.password2.name }}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.especialidades.label }}</label>
+                        <input type="text" name="{{ form.especialidades.name }}" class="form-control" value="{{ form.especialidades.value|default_if_none:'' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Días de Trabajo</label>
+                        <div style="max-height: 150px; overflow-y: auto;"> <!-- Limitar altura y habilitar desplazamiento -->
+                            <table class="table table-dark">
+                                <thead>
+                                    <tr>
+                                        <th>Lunes</th>
+                                        <th>Martes</th>
+                                        <th>Miércoles</th>
+                                        <th>Jueves</th>
+                                        <th>Viernes</th>
+                                        <th>Sábado</th>
+                                        <th>Domingo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="dias_trabajo" value="Lunes" {% if 'Lunes' in form.dias_trabajo.value %}checked{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="dias_trabajo" value="Martes" {% if 'Martes' in form.dias_trabajo.value %}checked{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="dias_trabajo" value="Miércoles" {% if 'Miércoles' in form.dias_trabajo.value %}checked{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="dias_trabajo" value="Jueves" {% if 'Jueves' in form.dias_trabajo.value %}checked{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="dias_trabajo" value="Viernes" {% if 'Viernes' in form.dias_trabajo.value %}checked{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="dias_trabajo" value="Sábado" {% if 'Sábado' in form.dias_trabajo.value %}checked{% endif %}>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="dias_trabajo" value="Domingo" {% if 'Domingo' in form.dias_trabajo.value %}checked{% endif %}>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                
+                    <div class="mb-3">
+                        <label class="form-label">Hora de Inicio</label>
+                        {{ form.hora_inicio }}
+                    </div>
+                
+                    <div class="mb-3">
+                        <label class="form-label">Hora de Fin</label>
+                        {{ form.hora_fin }}
+                    </div>
+                    
+                    
+
+                   
+
+                    <div class="mb-3">
+                        <label class="form-label">Ubicación</label>
+                        <select name="{{ form.ubicacion.name }}" class="form-select" required>
+                            <option value="">Seleccione una ubicación</option>
+                            {% for opcion in form.ubicacion.field.choices %}
+                                <option value="{{ opcion.0 }}">{{ opcion.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Localidades Disponibles</label>
+                        <table class="table table-dark">
+                            <thead>
+                                <th colspan="7" class="text-center">Seleccione las comunas donde trabaja:</th> <!-- Título centrado -->
+                            </thead>
+                            <tbody>
+                                {% for localidad in form.localidades %}
+                                    {% if forloop.counter0|divisibleby:4 and not forloop.first %}
+                                        </tr>
+                                    {% endif %}
+                                    {% if forloop.counter0|divisibleby:4 %}
+                                        <tr>
+                                    {% endif %}
+                                    <td style="border: 3px solid white;"> <!-- Línea blanca para las celdas -->
+                                        {{ localidad }}
+                                        {{ localidad.label }}
+                                    </td>
+                                {% endfor %}
+                                {% if forloop.last %}
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+
+                    <div style="text-align: center;">
+                        <button type="submit" class="button-register">Registrarse</button>
+                    </div>
+                </form>
+                <h5 class="h5-labels" style="padding: 5px">¿Ya tienes una cuenta? <a href="">Inicia sesión</a></h5>
+            </div>
+        </div>
+        <div class="container mt-4 text-center">
+            <img src="{% static 'images/logoreal.png' %}" alt="Logo Mediano" class="img-fluid" style="margin-top: 90px; width: 250px; height: 250px;">
+        </div>
+    </div>
+</div>
+{% endblock %}

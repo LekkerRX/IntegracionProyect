@@ -1,0 +1,144 @@
+faltantes:
+-1.- arreglar los botones de registro e inicio , eleccion de cliente o tecncio no reacciona al click.
+    ##arreglar area del button.
+0.- añadir atributo fecha de creacion, fecha de termino a la publicacion
+    ##añadir al models, y al forms automaticamente.
+1.-nose si dejar el nombre para editar.
+    ##??    
+2.-poder elegir horas personalizadas para cada dia.
+    ##??
+3.-el cambiar el correo debería pedir la contraseña, o enviar un correo  , no debería ser solo cambiar por cambiar o nose.
+    ##esto se puede corregir añadiendo un mensaje via email de confirmacion al correo nuevo que el usuario quiere añadir.
+     ##este email va al correo al cual intenta actualizar para confirmar que ese correo realmente es de el.
+4.-al momento de migrar a la nube se debera crear la tabla localidad con las comunas , esto se debe a que no se migra bien.
+    ##esto se puede corregir cambiando de lugar el modelo de localidad a una aplicacion propia llamada localidad y migrar nuevamente.
+
+5.- añadir estos tipos de tecnicos en el forms de registrar tencico,añadir atributo en models con choices.
+##
+
+Técnicos Generales:
+Técnico en fontanería (Plomería)
+
+Reparación y mantenimiento de sistemas de agua, drenaje, caños, grifos, inodoros, etc.
+Técnico en electricidad
+
+Reparación y mantenimiento de instalaciones eléctricas, cableado, interruptores, enchufes, cuadros eléctricos.
+Técnico en climatización (Aire acondicionado y calefacción)
+
+Instalación, reparación y mantenimiento de sistemas de calefacción, ventilación y aire acondicionado (HVAC).
+Técnico en carpintería
+
+Fabricación e instalación de muebles, puertas, ventanas, y otras estructuras de madera.
+Técnico en pintura
+
+Pintura interior y exterior de paredes, techos, puertas y ventanas.
+Técnico en cerrajería
+
+Reparación de cerraduras, cambio de llaves, instalación de sistemas de seguridad.
+Técnico en reparación de electrodomésticos
+
+Reparación de aparatos como lavadoras, secadoras, refrigeradores, microondas, hornos.
+Técnico en instalación de sistemas de seguridad
+
+Instalación de alarmas, cámaras de seguridad, sistemas de control de acceso.
+Técnico en reparación de electrodomésticos de cocina
+
+Reparación de estufas, hornos, lavavajillas, campanas extractoras.
+Técnico en mantenimiento de jardines y paisajismo
+
+Diseño y mantenimiento de jardines, poda de árboles, control de plagas, instalación de riego.
+Especialistas Técnicos:
+Técnico en gas
+
+Instalación y reparación de sistemas de gas, calefacción a gas, cocinas a gas, etc.
+Técnico en instalación de sistemas de energía renovable
+
+Instalación de paneles solares, generadores eólicos, sistemas de energía geotérmica.
+Técnico en aislamiento térmico y acústico
+
+Instalación de aislamiento en paredes, techos, ventanas, y puertas para mejorar la eficiencia energética y reducir el ruido.
+Técnico en sistemas de domótica (automatización del hogar)
+
+Instalación y configuración de sistemas inteligentes para controlar iluminación, temperatura, dispositivos, etc.
+Técnico en drenaje y saneamiento
+
+Reparación de sistemas de drenaje y alcantarillado, limpieza de pozos sépticos.
+Técnico en impermeabilización
+
+Servicios de impermeabilización de techos, paredes, sótanos, etc.
+Técnico en mantenimiento de piscinas
+
+Mantenimiento, limpieza y reparación de piscinas y sistemas de filtrado.
+Técnico en remodelación de interiores
+
+Diseño y renovación de espacios interiores: suelos, paredes, techos, iluminación.
+Técnico en instalación de pisos y revestimientos
+
+Instalación de cerámica, madera, alfombra, vinil, entre otros materiales.
+Técnico en instalación de sistemas de telecomunicaciones
+
+Instalación de antenas, cableado de internet, televisión por satélite.
+Especialidades Adicionales:
+Técnico en reparación de computadoras y dispositivos electrónicos
+
+Reparación de computadoras de escritorio, laptops, consolas de videojuegos, televisores, etc.
+Técnico en limpieza profunda
+
+Servicios de limpieza profunda en hogares, alfombras, cortinas, etc.
+Técnico en instalación de cortinas y persianas
+
+Instalación de persianas, estores, cortinas, toldos, etc.
+Técnico en exterminación de plagas
+
+Control de plagas y fumigación para eliminar insectos, roedores, termitas, etc.
+Técnico en tapicería
+
+Reparación y restauración de muebles tapizados, sillas, sofás, etc.
+Técnico en reparación de electrodomésticos pequeños
+
+Reparación de electrodomésticos de cocina y hogar como licuadoras, batidoras, aspiradoras, etc.
+Técnico en instalación de sistemas de agua potable
+
+Instalación de sistemas de purificación y filtrado de agua.
+Técnico en instalaciones sanitarias
+
+Instalación y reparación de sistemas de saneamiento como drenaje, bombeo de agua, etc.
+Técnico en instalación de sistemas de calefacción
+
+Instalación de estufas, calderas, radiadores, etc.
+Técnico en instalación de sistemas de ventilación
+
+Instalación de sistemas de ventilación en espacios cerrados.
+Otros Especialistas:
+Técnico en mantenimiento de sistemas de telecomunicaciones y cableado
+
+Instalación y reparación de sistemas de cableado para televisión, telefonía, o redes de datos.
+Técnico en sistemas de alarma contra incendios
+
+Instalación y mantenimiento de alarmas contra incendios, extintores, rociadores, etc.
+Técnico en reparación de techos y cubiertas
+
+Reparación de tejados, tejas, impermeabilización de techos.
+Técnico en instalaciones de paneles solares térmicos
+
+Instalación de paneles solares térmicos para calefacción de agua.
+Técnico en instalación de sistemas de tratamiento de aguas residuales
+
+Instalación y mantenimiento de sistemas de tratamiento de aguas residuales.
+Técnico en mantenimiento de sistemas de climatización industrial
+
+Mantenimiento y reparación de sistemas de climatización en edificios de gran escala.
+
+
+6.- falta las validaciones para las certificaciones , y falta area para subir certificacion.
+
+cuenta cliente 1 :
+
+racimo_estable0o@icloud.com
+
+Sapito321=@
+cuenta cliente 2 :
+
+racimo_estable0o2@icloud.com
+Sapito3211=@
+
