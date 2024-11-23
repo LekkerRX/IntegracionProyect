@@ -2,7 +2,15 @@
 {% load static %}
 {% block content %}
 
-<div class="container">
+<div class="container" >
+
+    <div class="container mt-4">
+        <img src="{% static 'images/logoreal.png' %}" 
+             alt="Logo Mediano" 
+             class="img-fluid" 
+             style="width: 280px; height: 280px; margin-top: 25px; position: absolute; right: 0;">
+    </div>
+
     {% if form.non_field_errors %}
         <div class="alert alert-danger" role="alert">
             {{ form.non_field_errors }}
@@ -24,7 +32,7 @@
             <!-- Modal de Bootstrap -->
             <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content" style="color: black;">
+                    <div class="modal-content" style="color: black;background: rgba( 255, 255, 255, 0.45 );box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );backdrop-filter: blur( 3px );-webkit-backdrop-filter: blur( 3px );border-radius: 10px;border: 1px solid rgba( 255, 255, 255, 0.18 );">
                         <div class="modal-header">
                             <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -53,9 +61,7 @@
             </div>
         </div>
     </div>
-    <div class="container mt-4 text-center">
-        <img src="{% static 'images/logoreal.png' %}" alt="Logo Mediano" class="img-fluid" style="margin-top:-300px;width:250px;height:250px">
-    </div>
+   
 </div>
 
 {% endblock %}

@@ -45,6 +45,17 @@ INSTALLED_APPS = [
     'Post',
     'django.contrib.humanize',
     'ProyectV1',
+    'multiselectfield',
+    'Oficio',
+    'Aceptaciones',
+    'Notificaciones',
+    'Credencial',
+    'Administrador',
+    'Chat',
+    
+ 
+    
+  
     
 ]
 
@@ -117,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-Es'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'America/Santiago'
 

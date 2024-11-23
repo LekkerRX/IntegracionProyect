@@ -1,9 +1,12 @@
 
 from django.db import models
 from django.contrib.auth.models import User  # Importa el modelo User de Django
+from multiselectfield import MultiSelectField
+from Oficio.models import Oficio
 
 class Publicacion(models.Model):
     # Título de la publicación
+    visible_para_tecnicos = models.BooleanField(default=True)
     
 
     titulo = models.CharField(max_length=100, verbose_name="Título")
@@ -12,7 +15,7 @@ class Publicacion(models.Model):
     descripcion = models.TextField(verbose_name="Descripción")
 
     # Límite de monto a pagar
-    limite_monto = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Límite del monto a pagar (CLP)")
+    limite_monto = models.PositiveIntegerField(verbose_name="Límite del monto a pagar (CLP)")
 
     # Imagen opcional
     imagen = models.ImageField(upload_to='publicaciones/', blank=True, null=True, verbose_name="Imagen del problema")
@@ -61,7 +64,7 @@ class Publicacion(models.Model):
         ('climatizacion_industrial', 'Técnico en mantenimiento de sistemas de climatización industrial'),
         ('otros', 'Otro'),
     ]
-    oficio = models.CharField(max_length=50, choices=OFICIOS_CHOICES, default='otros')
+    oficios = models.ManyToManyField(Oficio, related_name='publicaciones', verbose_name="Oficios requeridos")
 
     
     fecha_publicacion = models.DateTimeField(auto_now=True)

@@ -1,19 +1,12 @@
 
-
-
 import re 
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django import forms
-
-from django import forms
 from .models import Tecnico
-
-from django import forms
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from .models import Tecnico,Localidad
+from Oficio.models import Oficio
 
 COMUNAS_SANTIAGO = [
     ('Cerrillos', 'Cerrillos'),
@@ -88,11 +81,13 @@ class ImagenPerfilForm(forms.ModelForm):
         ('Sábado', 'Sábado'),
         ('Domingo', 'Domingo'),
     ]
+    oficios = forms.ModelMultipleChoiceField(queryset=Oficio.objects.all(), required=True, widget=forms.CheckboxSelectMultiple(attrs={'id': 'oficios'}), error_messages={'required': 'El campo oficio es obligatorio.'})
+
     localidades = forms.ModelMultipleChoiceField(
         queryset=Localidad.objects.all(),  # Obtén todas las localidades de la base de datos
         widget=forms.CheckboxSelectMultiple,  # Puedes usar Checkboxes para selección múltiple
         label="Localidades Disponibles",
-        error_messages={'required': 'Este campo es obligatorio.'}
+        error_messages={'required': 'El campo Localidades es obligatorio.'}
     )
     
     dias_trabajo = forms.MultipleChoiceField(
@@ -106,16 +101,16 @@ class ImagenPerfilForm(forms.ModelForm):
 
     
 
-    hora_inicio = forms.ChoiceField(
-        choices=[(f"{h}:00", f"{h}:00") for h in range(24)],
+    hora_inicio = forms.TimeField(
         label="Hora de Inicio",
-        widget=forms.Select(attrs={'class': 'form-select'})  # Clase Bootstrap para select
+        widget=forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+        error_messages={'required': 'El campo Hora de inicio es obligatorio.'}
     )
 
-    hora_fin = forms.ChoiceField(
-        choices=[(f"{h}:00", f"{h}:00") for h in range(24)],
+    hora_fin = forms.TimeField(
         label="Hora de Fin",
-        widget=forms.Select(attrs={'class': 'form-select'})  # Clase Bootstrap para select
+        widget=forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+        error_messages={'required': 'El campo Hora de fin es obligatorio.'}
     )
 
     correo = forms.EmailField(
@@ -123,14 +118,14 @@ class ImagenPerfilForm(forms.ModelForm):
         label="Correo electrónico",
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
         error_messages={
-            'required': 'Este campo es obligatorio.',
+            'required': 'El campo Correo Electrónico es obligatorio.',
             'invalid': 'Ingrese una dirección de correo electrónico válida.',
         }
     )
 
     class Meta:
         model = Tecnico
-        fields = ['imagen_perfil', 'nombre', 'correo', 'dias_trabajo', 'hora_inicio', 'hora_fin','localidades']
+        fields = ['imagen_perfil', 'nombre', 'correo', 'dias_trabajo','oficios', 'hora_inicio', 'hora_fin','localidades']
         widgets = {
             'imagen_perfil': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
@@ -156,16 +151,21 @@ class ImagenPerfilForm(forms.ModelForm):
 
     def save(self, commit=True):
         tecnico = super().save(commit=False)
-        
-        # Construir la cadena de horario disponible
+
+        # Guardar los oficios seleccionados
+        oficios_seleccionados = self.cleaned_data['oficios']
+        tecnico.oficios.set(oficios_seleccionados)  # Usamos set() para actualizar los oficios seleccionados
+
+        # Guardar otros datos del perfil
         dias_seleccionados = ', '.join(self.cleaned_data['dias_trabajo'])
         horario = f"{dias_seleccionados} desde las {self.cleaned_data['hora_inicio']} hasta las {self.cleaned_data['hora_fin']}"
         tecnico.horario_disponible = horario
-        
+
         if commit:
             tecnico.save()
-        
+
         return tecnico
+
 
     
     
@@ -176,11 +176,12 @@ class ImagenPerfilForm(forms.ModelForm):
 # forms.py
 from django import forms
 from .models import Tecnico
+from django.core.validators import MinLengthValidator
 
 class EditProfileForm(forms.ModelForm):
     class Meta:
         model = Tecnico
-        fields = ['nombre', 'ubicacion','horario_disponible', 'especialidades', 'credenciales', 'imagen_perfil']
+        fields = ['nombre', 'ubicacion','horario_disponible', 'credenciales_tecnico', 'imagen_perfil']
 
 
 class TecnicoForm(forms.ModelForm):
@@ -193,6 +194,7 @@ class TecnicoForm(forms.ModelForm):
         ('Sábado', 'Sábado'),
         ('Domingo', 'Domingo'),
     ]
+    oficios = forms.ModelMultipleChoiceField(queryset=Oficio.objects.all(), required=True, widget=forms.CheckboxSelectMultiple(attrs={'id': 'oficios'}), error_messages={'required': 'El campo oficio es obligatorio.'})
 
     dias_trabajo = forms.MultipleChoiceField(
         choices=DIAS,
@@ -202,24 +204,25 @@ class TecnicoForm(forms.ModelForm):
 
     hora_inicio = forms.ChoiceField(
         choices=[(f"{h}:00", f"{h}:00") for h in range(24)],
-  # Añadir clase Bootstrap y tipo time        label="Hora de Inicio",
+        label="Hora de Inicio",
+        widget=forms.Select(attrs={'class': 'form-control form-select'})  # Añadidas clases Bootstrap
     )
 
     hora_fin = forms.ChoiceField(
         choices=[(f"{h}:00", f"{h}:00") for h in range(24)],
         label="Hora de Fin",
-   
+        widget=forms.Select(attrs={'class': 'form-control form-select'})  # Añadidas clases Bootstrap
     )
     nombre = forms.CharField(
         label="Nombre",
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
-        error_messages={'required': 'Este campo es obligatorio.'}
+        error_messages={'required': 'El campo Nombre es obligatorio.'}
     )
     email = forms.EmailField(
         label="Correo electrónico",
         widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Correo electrónico'}),
         error_messages={
-            'required': 'Este campo es obligatorio.',
+            'required': 'El campo Correo electrónico es obligatorio.',
             'invalid': 'Ingrese una dirección de correo electrónico válida.',
         }
     )
@@ -228,54 +231,66 @@ class TecnicoForm(forms.ModelForm):
     horario_disponible = forms.CharField(
         label="Horario Disponible",
         required=False,
-        widget=forms.HiddenInput()
+        widget=forms.HiddenInput(),
+        error_messages={
+            'required': 'El campo Horario disponible es obligatorio.',
+           
+        }
     )
     
     ubicacion = forms.ChoiceField(
         label="Ubicación",
         choices=COMUNAS_SANTIAGO,  # Usar la lista de comunas
         widget=forms.Select(attrs={'class': 'form-control'}),
-        error_messages={'required': 'Este campo es obligatorio.'}
+        error_messages={'required': 'El campo Ubicación es obligatorio.'}
     )
     
-    ubicacion = forms.ChoiceField(
-        label="Ubicación",
-        choices=COMUNAS_SANTIAGO,  # Usar la lista de comunas
-        widget=forms.Select(attrs={'class': 'form-control'}),
-        error_messages={'required': 'Este campo es obligatorio.'}
-    )
+    
     
     localidades = forms.ModelMultipleChoiceField(
         queryset=Localidad.objects.all(),  # Obtén todas las localidades de la base de datos
         widget=forms.CheckboxSelectMultiple,  # Puedes usar Checkboxes para selección múltiple
         label="Localidades Disponibles",
-        error_messages={'required': 'Este campo es obligatorio.'}
+        error_messages={'required': 'El Localidad es obligatorio.'}
     )
 
     password1 = forms.CharField(
         label="Contraseña",
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
-        error_messages={'required': 'Este campo es obligatorio.'}
+        error_messages={'required': 'Este campo es obligatorio.'},
+        validators=[MinLengthValidator(8)],  # Contraseña mínima de 8 caracteres
     )
 
     password2 = forms.CharField(
         label="Confirmar Contraseña",
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirmar contraseña'}),
-        error_messages={'required': 'Este campo es obligatorio.'}
+        error_messages={'required': 'Este campo es obligatorio.'},
     )
     
     
 
     class Meta:
         model = Tecnico
-        fields = ['nombre', 'ubicacion', 'horario_disponible', 'especialidades', 'credenciales', 'localidades', 'email', 'password1', 'password2']
+        fields = ['nombre', 'ubicacion', 'horario_disponible','oficios', 'credenciales_tecnico', 'localidades', 'email', 'password1', 'password2']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre completo'}),
             'horario_disponible': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Horario disponible'}),
-            'especialidades': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Especialidades, separadas por comas'}),
             'localidades': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Localidades en las que trabaja'}),
-            'credenciales': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+            'credenciales_tecnico': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        
+        # Validación de la contraseña (requiere al menos una mayúscula, un número y un carácter especial)
+        if not re.search(r'[A-Z]', password1):
+            raise ValidationError("La contraseña debe contener al menos una letra mayúscula.")
+        if not re.search(r'[0-9]', password1):
+            raise ValidationError("La contraseña debe contener al menos un número.")
+        if not re.search(r'[@$!%*?&]', password1):
+            raise ValidationError("La contraseña debe contener al menos un carácter especial (@, $, !, %, *, ?, &).")
+        
+        return password1
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -283,13 +298,18 @@ class TecnicoForm(forms.ModelForm):
             raise ValidationError("Este correo electrónico ya está registrado.")
         return email
 
+
     def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('password1')
         password2 = cleaned_data.get('password2')
+        
 
+            # Verificar si las contraseñas coinciden
         if password1 and password2 and password1 != password2:
             raise ValidationError("Las contraseñas no coinciden. Por favor, ingrese las mismas contraseñas en ambos campos.")
+
+        return cleaned_data
 
         # Aquí podrías agregar más validaciones para la contraseña si lo deseas
 
@@ -409,11 +429,11 @@ class ClientRegistrationForm(forms.Form):
         label="Nombre de usuario único",
         strip=False,
         help_text="",
-        validators=[username_validator],  # Usar la función de validador personalizada
         error_messages={
             'required': 'Este campo es obligatorio.',
             'invalid': 'Ingrese un nombre de usuario válido.',
-        }
+        },
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre de usuario'})
     )
 
     email = forms.EmailField(
@@ -431,7 +451,7 @@ class ClientRegistrationForm(forms.Form):
     password1 = forms.CharField(
         label="Contraseña",
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password', 'placeholder': 'Contraseña'}),
         help_text="La contraseña debe tener al menos 8 caracteres y contener al menos una mayúscula, un número y un carácter especial (@, #, $, %, ^, &, +, =, !).",
         error_messages={
             'required': 'Este campo es obligatorio.',
@@ -440,18 +460,31 @@ class ClientRegistrationForm(forms.Form):
 
     password2 = forms.CharField(
         label="Confirmar Contraseña",
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'new-password', 'placeholder': 'Confirmar contraseña'}),
         strip=False,
         error_messages={
             'required': 'Este campo es obligatorio.',
         }
     )
 
+    # Métodos de validación permanecen sin cambios
     def clean_username(self):
         username = self.cleaned_data.get('username')
+
+        # Verificar si el nombre ya está registrado
         if User.objects.filter(username=username).exists():
-            raise ValidationError("Este nombre de usuario ya está registrado.")
+            raise ValidationError("Este nombre ya está registrado.")
+
+        # Verificar que solo contenga letras, espacios y caracteres válidos
+        if not re.match(r'^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$', username):  # Incluye espacios (\s)
+            raise ValidationError(
+                "El nombre solo puede contener letras, espacios y caracteres válidos como tildes."
+            )
+
         return username
+
+
+
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -484,3 +517,4 @@ class ClientRegistrationForm(forms.Form):
             password=self.cleaned_data["password1"],
         )
         return user
+
