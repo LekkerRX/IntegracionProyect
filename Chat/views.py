@@ -23,9 +23,9 @@ from firebase_admin import db
 from datetime import datetime
 
 if not firebase_admin._apps:
-    #cred = firebase_admin.credentials.Certificate("ProyectV1/chat-98e8c-firebase-adminsdk-2sjfp-4d69c8e2f8.json")
-    #firebase_admin.initialize_app(cred, {
-        #'databaseURL': 'https://chat-98e8c-default-rtdb.firebaseio.com'
+    cred = firebase_admin.credentials.Certificate("ProyectV1/chat-98e8c-firebase-adminsdk-2sjfp-4d69c8e2f8.json")
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': 'https://chat-98e8c-default-rtdb.firebaseio.com'
     })
 else:
     print("Firebase ya está inicializado.")
